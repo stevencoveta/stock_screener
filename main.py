@@ -125,16 +125,17 @@ try:
         st.dataframe(dff.fillna(0))
         dff = dff.fillna(0)
 
-        buffer = io.BytesIO()
-        with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-            dff.to_excel(writer, sheet_name='optionPrices')
+        #buffer = io.BytesIO()
+        #with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
+        
+        df_data = dff.to_excel('optionPrices.xlsx')
         #writer.save()
             #buffer.close()
         #csv = convert_df(dff)
 
-        st.sidebar.download_button(
+        st.download_button(
             label="Download data as Excel",
-            data=buffer,
+            data=df_data,
             file_name='optionPrices.xlsx',
             mime="application/vnd.ms-excel"
             
