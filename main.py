@@ -34,7 +34,7 @@ def get_data(custom,tk):
         return data
         
         
-@st.cache(ttl=3600, allow_output_mutation=True)
+@st.cache(ttl=600, allow_output_mutation=True)
 def option_info(ticker):
     msft = yf.Ticker(ticker)
     opt = msft.option_chain(msft.options[0])[0]
@@ -132,7 +132,7 @@ try:
             #buffer.close()
         #csv = convert_df(dff)
 
-        st.download_button(
+        st.sidebar.download_button(
             label="Download data as Excel",
             data=buffer,
             file_name='optionPrices.xlsx',
