@@ -10,15 +10,24 @@ import streamlit as st
 
 
 st.title("Options Stocks Screener")
+
+def to_excel(df):
+    output = BytesIO()
+    writer = pd.ExcelWriter(output, engine='xlsxwriter')
+    df.to_excel(writer, sheet_name='Sheet1')
+    writer.save()
+    processed_data = output.getvalue()
+    return processed_data
+
 def get_table_download_link(df):
     """Generates a link allowing the data in a given panda dataframe to be downloaded
     in:  dataframe
     out: href string
     """
-    csv = df.to_csv(index=False)
-    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
-    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
-    
+    val = to_excel(df)
+    b64 = base64.b64encode(val)  # val looks like b'...'
+    return f'<a href="data:application/octet-stream;base64,{b64.decode()}" download="extract.xlsx">Download csv file</a>' # decode b'abc' => abc
+
 @st.cache(ttl=600,allow_output_mutation=True)
 def get_data(custom,tk):
     if custom == "Custom Data":
@@ -132,10 +141,10 @@ try:
         #print(dff)
         st.dataframe(dff.fillna(0))
         dff = dff.fillna(0)
-        get_table_download_link(dff)
         #buffer = io.BytesIO()
         #with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-        
+        st.markdown(get_table_download_link(dff), unsafe_allow_html=True)
+
         df_data = dff.to_excel('optionPrices.xlsx')
         #writer.save()
             #buffer.close()
