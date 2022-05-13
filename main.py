@@ -10,7 +10,15 @@ import streamlit as st
 
 
 st.title("Options Stocks Screener")
-
+def get_table_download_link(df):
+    """Generates a link allowing the data in a given panda dataframe to be downloaded
+    in:  dataframe
+    out: href string
+    """
+    csv = df.to_csv(index=False)
+    b64 = base64.b64encode(csv.encode()).decode()  # some strings <-> bytes conversions necessary here
+    href = f'<a href="data:file/csv;base64,{b64}">Download csv file</a>'
+    
 @st.cache(ttl=600,allow_output_mutation=True)
 def get_data(custom,tk):
     if custom == "Custom Data":
@@ -124,7 +132,7 @@ try:
         #print(dff)
         st.dataframe(dff.fillna(0))
         dff = dff.fillna(0)
-
+        get_table_download_link(dff)
         #buffer = io.BytesIO()
         #with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
         
