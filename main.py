@@ -143,9 +143,9 @@ try:
         dff = dff.fillna(0)
         #buffer = io.BytesIO()
         #with pd.ExcelWriter(buffer, engine='xlsxwriter') as writer:
-        st.markdown(get_table_download_link(dff), unsafe_allow_html=True)
+        #st.markdown(get_table_download_link(dff), unsafe_allow_html=True)
 
-        df_data = dff.to_excel('optionPrices.xlsx')
+        df_data = dff.to_excel('optionPrices.xlsx').encode('utf-8')
         #writer.save()
             #buffer.close()
         #csv = convert_df(dff)
