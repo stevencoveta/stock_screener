@@ -129,7 +129,7 @@ try:
         st.download_button(
             label="Download file data ",
             data=csv,
-            file_name='optionPrices.xlsx',
+            file_name='optionPrices.csv',
             mime="text/csv")
         
     else:
