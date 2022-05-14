@@ -157,6 +157,7 @@ try:
             mime="application/vnd.ms-excel"
             
             )
+        print("download button")
         
     else:
         st.write("No Data with those filters")
