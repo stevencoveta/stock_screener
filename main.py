@@ -10,7 +10,7 @@ import streamlit as st
 
 
 st.title("Options Stocks Screener")
-#@st.cache(ttl=600,allow_output_mutation=True)
+@st.cache(ttl=600,allow_output_mutation=True)
 def get_data(custom,tk):
     if custom == "Custom Data":
         today = date.today()
@@ -29,11 +29,11 @@ def get_data(custom,tk):
         df1 = pd.DataFrame( si.tickers_sp500(),columns = ["tickers"] )
         sp500 = df1.tickers.values 
     
-        data = yf.download(list(sp500)[:10],d1,date1, auto_adjust=True,interval="1d")
+        data = yf.download(list(sp500),d1,date1, auto_adjust=True,interval="1d")
         return data
         
         
-#@st.cache(ttl=600, allow_output_mutation=True)
+@st.cache(ttl=600, allow_output_mutation=True)
 def option_info(ticker):
     msft = yf.Ticker(ticker)
     opt = msft.option_chain(msft.options[0])[0]
