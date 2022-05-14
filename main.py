@@ -10,7 +10,7 @@ import streamlit as st
 
 
 st.title("Options Stocks Screener")
-@st.cache(ttl=600,allow_output_mutation=True)
+#@st.cache(ttl=600,allow_output_mutation=True)
 def get_data(custom,tk):
     if custom == "Custom Data":
         today = date.today()
@@ -33,7 +33,7 @@ def get_data(custom,tk):
         return data
         
         
-@st.cache(ttl=600, allow_output_mutation=True)
+#@st.cache(ttl=600, allow_output_mutation=True)
 def option_info(ticker):
     msft = yf.Ticker(ticker)
     opt = msft.option_chain(msft.options[0])[0]
