@@ -58,12 +58,12 @@ genre = st.sidebar.radio(
 
 if genre == 'Custom Data':
     agree = st.checkbox('Use custom strike dates')
-
+    bt = st.button('Run')
     uploaded_file = st.file_uploader("Choose a file")
 
     if uploaded_file is not None:
         tickers_excel = pd.read_excel(uploaded_file,engine='openpyxl')
-        if agree:
+        if agree and bt:
             st.write('Great!')
             
             lst = []
@@ -86,11 +86,11 @@ if genre == 'Custom Data':
                     file_name='optionPrices.csv',
                     mime="text/csv")
 
-        else:
+        if not agree and bt:
             lst = []
             tickers = tickers_excel.Symbol.dropna().values
             tickers = tickers[tickers != "Cash"]
-            tickers = tickers[:-100]
+            tickers = tickers[:-101]
             st.write(f"Downloading {len(tickers)} stocks from custom file ")
             for i in range(len(tickers)):
                 st.progress(i)
