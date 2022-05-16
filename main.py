@@ -90,7 +90,7 @@ if genre == 'Custom Data':
             lst = []
             tickers = tickers_excel.Symbol.dropna().values
             tickers = tickers[tickers != "Cash"]
-            tickers = tickers[:-101]
+            tickers = tickers[:101]
             st.write(f"Downloading {len(tickers)} stocks from custom file ")
             for i in range(len(tickers)):
                 st.progress(i)
