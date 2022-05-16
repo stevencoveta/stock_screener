@@ -1,5 +1,5 @@
 # Stock Screener
-Get current options stock price adn download it as a csv file. 
+Get current option chain data and download it as a csv file. 
 
 All the data is pulled from the yahoo finance api. 
 
