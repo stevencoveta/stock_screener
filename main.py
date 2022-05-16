@@ -73,8 +73,6 @@ if genre == 'Custom Data':
             dates = tickers_excel["Date Added"].dropna().values
             dt = [pd.to_datetime(dates[i]).strftime("%Y-%m-%d") for i in range(len(dates))]
             dt = dt[:101]
-            st.write(len(tickers))
-            st.write(len(dt))
             st.write(f"Downloading {len(tickers)} stocks from custom file with dates provided ")
             for i in range(len(tickers)):
                 st.progress(i)
