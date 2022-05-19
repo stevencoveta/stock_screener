@@ -109,7 +109,7 @@ elif genre == 'Screener' and pwd == "0001":
         st.write(f"Downloading {len(df1)} stocks from {option} ")
         for i in range(len(df1)):
             st.progress(i/len(df1))
-            lst.append(option_info(df1.values[i][0]))
+            lst.append(option_info(df1.values[i][0],False))
         main_df = pd.concat(lst).drop_duplicates()
         st.write(main_df)
         csv = convert_df(main_df)
@@ -124,7 +124,7 @@ elif genre == 'Screener' and pwd == "0001":
         st.write(f"Downloading {len(df2)} stocks from {option} ")
         for i in range(len(df2)):
             st.progress(i/len(df2))
-            lst.append(option_info(df2.values[i][0]))
+            lst.append(option_info(df2.values[i][0],False))
         main_df = pd.concat(lst).drop_duplicates()
         st.write(main_df)
         csv = convert_df(main_df)
