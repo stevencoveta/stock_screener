@@ -1,4 +1,4 @@
-import sqlite3
+from attr import mutable
 import yfinance as yf
 from yahoo_fin import stock_info as si
 import pandas as pd
@@ -6,43 +6,21 @@ import numpy as np
 from datetime import date
 import streamlit as st
 
-# Connect to SQLite database (or create it if it doesn't exist)
-conn = sqlite3.connect("users.db")
-cursor = conn.cursor()
 
-# Create table if not exists
-cursor.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    username TEXT PRIMARY KEY,
-    password TEXT,
-    role TEXT
-)
-''')
-conn.commit()
+# In-memory user database (for demonstration)
+user_db = {
+    "admin": {"password": "admin123", "role": "admin"},
+    "user1": {"password": "user123", "role": "user"}
+}
 
-# Function to authenticate user
+
+# Authentication function
 def authenticate(username, password):
-    cursor.execute("SELECT * FROM users WHERE username = ? AND password = ?", (username, password))
-    user = cursor.fetchone()
-    if user:
-        return user[2]  # Return role (user[2] is the role)
+    user = user_db.get(username)
+    if user and user["password"] == password:
+        return user["role"]
     return None
 
-# Function to create a new user
-def create_new_user(username, password, role="user"):
-    cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-    if cursor.fetchone() is None:  # If the user doesn't exist
-        cursor.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", (username, password, role))
-        conn.commit()
-        st.success(f"User {username} created successfully!")
-    else:
-        st.error(f"User {username} already exists!")
-
-# Function to delete a user
-def delete_user(username):
-    cursor.execute("DELETE FROM users WHERE username = ?", (username,))
-    conn.commit()
-    st.success(f"User {username} deleted successfully!")
 
 # Helper Function to Fetch Option Information
 def option_info(ticker, strike_date):
@@ -64,68 +42,46 @@ def option_info(ticker, strike_date):
         st.write(f"Error processing {ticker}: {e}")
         return pd.DataFrame()
 
+
 # Convert DataFrame to CSV
 def convert_df(dfs):
     return dfs.to_csv().encode("utf-8")
+
 
 # App UI
 st.title("Options Stocks Screener")
 
 # User Authentication
+# User Authentication
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
     st.session_state.role = None
-    st.session_state.username = None  # Initialize username in session state
-
-# Check if the admin user exists, if not, create it
-def create_admin_if_not_exists():
-    cursor.execute("SELECT * FROM users WHERE username = 'admin'")
-    if cursor.fetchone() is None:  # Admin doesn't exist
-        cursor.execute("INSERT INTO users (username, password, role) VALUES (?, ?, ?)", ("admin", "admin123", "admin"))
-        conn.commit()
-        st.success("Admin user created successfully!")
-
-# Run the function to create admin if not exists
-create_admin_if_not_exists()
+    st.session_state.username = None  # Add this line to store the username
 
 if not st.session_state.authenticated:
     st.sidebar.header("Login")
-    st.session_state.username = st.sidebar.text_input("Username")  # Store username in session state
+    username = st.sidebar.text_input("Username")
     password = st.sidebar.text_input("Password", type="password")
     if st.sidebar.button("Login"):
-        role = authenticate(st.session_state.username, password)  # Use username from session state
+        role = authenticate(username, password)
         if role:
             st.session_state.authenticated = True
             st.session_state.role = role
-            st.sidebar.success(f"Logged in as {st.session_state.username} ({role})")
+            st.session_state.username = username  # Store the username in session state
+            st.sidebar.success(f"Logged in as {username} ({role})")
         else:
             st.sidebar.error("Invalid username or password")
 else:
+    # Use the username from session state
     st.sidebar.success(f"Logged in as {st.session_state.username} ({st.session_state.role})")
     if st.sidebar.button("Logout"):
         st.session_state.authenticated = False
         st.session_state.role = None
-        st.session_state.username = None  # Reset username
+        st.session_state.username = None  # Clear the username
         st.experimental_rerun()
 
-# Admin Panel
-if st.session_state.role == "admin":
-    st.header("Admin Panel: Manage Users")
-    admin_action = st.radio("Choose an action", ["Create User", "Delete User"])
 
-    if admin_action == "Create User":
-        new_user = st.text_input("New Username")
-        new_password = st.text_input("New Password", type="password")
-        role = st.selectbox("Role", ["user", "admin"])
-        if st.button("Create User"):
-            create_new_user(new_user, new_password, role)
-
-    elif admin_action == "Delete User":
-        user_to_delete = st.selectbox("Select User to Delete", [user[0] for user in cursor.execute("SELECT username FROM users").fetchall()])
-        if st.button("Delete User"):
-            delete_user(user_to_delete)
-
-# Main App Content (e.g., your screener logic here)
+# Main App Content
 if st.session_state.authenticated and st.session_state.role:
     genre = st.sidebar.radio(
         "Upload Custom Data or Use the Screener",
@@ -158,9 +114,7 @@ if st.session_state.authenticated and st.session_state.role:
                     mime="text/csv"
                 )
 
-    # Add your Screener functionality here as needed...
-
-    elif genre == "Screener":
+    elif genre == "Screener" :
         option = st.selectbox(
             "What data would you like to use",
             ("None", "Dow", "SP500")
@@ -181,7 +135,7 @@ if st.session_state.authenticated and st.session_state.role:
                 file_name=f"optionPrices{option}.csv",
                 mime="text/csv"
             )
-
+        
         elif option == "SP500":
             df2 = pd.DataFrame(si.tickers_sp500())
             st.write(f"Downloading {len(df2)} stocks from {option}")
@@ -197,3 +151,4 @@ if st.session_state.authenticated and st.session_state.role:
                 file_name=f"optionPrices{option}.csv",
                 mime="text/csv"
             )
+# Add your Screener functionality here as needed...
